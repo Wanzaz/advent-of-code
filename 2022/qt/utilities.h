@@ -30,6 +30,9 @@ namespace Utilities {
 
     // Skip some lines in file by the provided line number
     fstream& goToLine(fstream& file, unsigned int num);
+
+    // Test a string if it is an Integer
+    bool isInteger(const string& str);
 }
 
 #endif // UTILITIES_H

@@ -78,4 +78,13 @@ namespace Utilities {
         return file;
     }
 
+    bool isInteger(const string& str) {
+        try {
+            stoi(str);
+            return true;
+        } catch (...) {
+            return false;
+        }
+    }
+
 }

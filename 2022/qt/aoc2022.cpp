@@ -1045,20 +1045,27 @@ typedef struct _monkey
     int testNum;
     int trueCase;
     int falseCase;
+    int inspectNum = 0;
 } Monkey;
+
+void printMonkeys(vector<Monkey> monkeys) {
+    QTextStream qout(stdout);
+    for (auto i = 0; i < monkeys.size(); ++i) {
+        qout << i << ": ";
+        for (auto j = 0; j <monkeys[i].items.size(); ++j) {
+            qout << monkeys[i].items[j] << ", ";
+        }
+        qout << "\n";
+    }
+    qout << "-------------------------\n";
+}
+
 
 int AoC2022::day_11_1(QString user_input)
 {
-    auto input = Utilities::splitQStringByNewline(user_input);
-
-    auto monkeyMap = map<int, vector<int>>{};
-    auto bussinessMap = map<int, int>{};
-    auto businessLevel = 0;
-    // auto monkeys = vector<Monkey>{};
+    // auto input = Utilities::splitQStringByNewline(user_input);
+    auto input = Utilities::readAllLinesInFile("/Users/ondrejpazourek/dev/cpp/advent-of-code/2022/qt/data/day_11.txt");
     vector<Monkey> monkeys;
-    // Monkey m;
-
-    QTextStream qout(stdout);
 
     // Parsing input
     for (auto i = 0; i < input.size() - 1; i += 7) {
@@ -1089,17 +1096,56 @@ int AoC2022::day_11_1(QString user_input)
         monkeys.push_back(monkey);
     }
 
+    for (auto k = 0; k < 20; ++k) {
+        // Round
+        float worryLevel = 0;
+        for (auto i = 0; i < monkeys.size(); ++i) {
+            // Turn
+            for (auto j = 0; j <monkeys[i].items.size(); ++j) {
 
-    for (auto i = 0; i < monkeys.size(); ++i) {
-        qout << i << ": ";
-        for (auto j = 0; j <monkeys[i].items.size(); ++j) {
-            qout << monkeys[i].items[j] << ", ";
+                // Figure out its worry level
+                if (monkeys[i].operation[1] == "*" && monkeys[i].operation[2] == "old") {
+                    worryLevel = monkeys[i].items[j] * monkeys[i].items[j];
+                } else if (monkeys[i].operation[1] == "+" && monkeys[i].operation[2] == "old") {
+                    worryLevel = monkeys[i].items[j] + monkeys[i].items[j];
+                } else if (monkeys[i].operation[1] == "*" && Utilities::isInteger(monkeys[i].operation[2])) {
+                    worryLevel = monkeys[i].items[j] * stoi(monkeys[i].operation[2]);
+                } else if (monkeys[i].operation[1] == "+" && Utilities::isInteger(monkeys[i].operation[2])) {
+                    worryLevel = monkeys[i].items[j] + stoi(monkeys[i].operation[2]);
+                }
+
+                // Divide worry level by 3
+                auto finalWorryLevel = static_cast<int>(std::floor(worryLevel / 3));
+
+                // Deciding by the result of the test where the bag will be thrown
+                if (finalWorryLevel % monkeys[i].testNum == 0) {
+                    monkeys[monkeys[i].trueCase].items.push_back(finalWorryLevel);
+                } else {
+                    monkeys[monkeys[i].falseCase].items.push_back(finalWorryLevel);
+                }
+
+                // Adding 1 to the inspectNum so we can count the business level afterwards
+                monkeys[i].inspectNum++;
+            }
+
+            // Remove the bags that were thrown
+            monkeys[i].items.clear();
         }
-        qout << "\n";
+        // printMonkeys(monkeys);
     }
 
+    auto max1 = 0;
+    auto max2 = 0;
+    for (auto i = 0; i < monkeys.size(); ++i) {
+       if (monkeys[i].inspectNum > max1) {
+            max2 = max1;
+            max1 = monkeys[i].inspectNum;
+       } else if (monkeys[i].inspectNum > max2) {
+           max2 = monkeys[i].inspectNum;
+       }
+    }
 
-    return businessLevel;
+    return max1 * max2;
 }
 
 

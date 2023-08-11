@@ -91,10 +91,10 @@ void MainWindow::execute()
     }
 
     // It over-writes the "The result is 0" statement because of an empty input line
-    if (input.isEmpty()) {
-        ui->textEdit->setText("Invalid input! \n"
-                              "Please put valid input into the input line above.");
-    }
+    // if (input.isEmpty()) {
+        // ui->textEdit->setText("Invalid input! \n"
+                              // "Please put valid input into the input line above.");
+    // }
 
 }
 
