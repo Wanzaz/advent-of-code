@@ -14,11 +14,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->comboBox->addItems({"1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
                             "11"});
-    // gb.setLayout(ui->radioButtonLayout);
-
+    ui->textEdit->setText("Always provide right input for the right day\n"
+                          "If not there is a possibility that program will crash without any warning!\n");
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::execute);
-
-    // aocSwitch(i);
 }
 
 MainWindow::~MainWindow()
@@ -79,7 +77,7 @@ void MainWindow::execute()
             ui->textEdit->setText(output_text);
             break;
         case 11:
-            output_text = output_text.arg(AoC.day_11_1(input));
+            output_text = part == 1 ? output_text.arg(AoC.day_11_1(input)) : output_text.arg(AoC.day_11_2(input));
             ui->textEdit->setText(output_text);
             break;
         default:
@@ -91,10 +89,10 @@ void MainWindow::execute()
     }
 
     // It over-writes the "The result is 0" statement because of an empty input line
-    // if (input.isEmpty()) {
-        // ui->textEdit->setText("Invalid input! \n"
-                              // "Please put valid input into the input line above.");
-    // }
+    if (input.isEmpty()) {
+        ui->textEdit->setText("Invalid input! \n"
+                              "Please put valid input into the input line above.");
+    }
 
 }
 

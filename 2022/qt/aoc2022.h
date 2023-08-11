@@ -44,6 +44,7 @@ public:
     string day_10_2(QString user_input);
 
     int day_11_1(QString user_input);
+    int day_11_2(QString user_input);
 
 private:
 };
