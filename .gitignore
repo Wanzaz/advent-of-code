@@ -39,8 +39,8 @@
 *.app
 
 # CMake specifics
-CMakeLists.txt.user
-CMakeLists.txt
+2022/qt/CMakeLists.txt.user
+2022/qt/CMakeLists.txt
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
