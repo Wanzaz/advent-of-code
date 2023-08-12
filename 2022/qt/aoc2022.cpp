@@ -1061,7 +1061,8 @@ void printMonkeys(vector<Monkey> monkeys) {
     qout << "-------------------------\n";
 }
 
-
+// Figure out which monkeys to chase by counting how many items they inspect over 20 rounds.
+    // What is the level of monkey business after 20 rounds of stuff-slinging simian shenanigans?
 int AoC2022::day_11_1(QString user_input)
 {
     auto input = Utilities::splitQStringByNewline(user_input);
@@ -1115,14 +1116,11 @@ int AoC2022::day_11_1(QString user_input)
                 }
 
                 // Divide worry level by 3
-                auto finalWorryLevel = static_cast<int>(std::floor(worryLevel / 3));
+                auto finalWorryLevel = static_cast<int>(floor(worryLevel / 3));
 
                 // Deciding by the result of the test where the bag will be thrown
-                if (finalWorryLevel % monkeys[i].testNum == 0) {
-                    monkeys[monkeys[i].trueCase].items.push_back(finalWorryLevel);
-                } else {
-                    monkeys[monkeys[i].falseCase].items.push_back(finalWorryLevel);
-                }
+                int destination = finalWorryLevel % monkeys[i].testNum == 0 ? monkeys[i].trueCase : monkeys[i].falseCase;
+                monkeys[destination].items.push_back(finalWorryLevel);
 
                 // Adding 1 to the inspectNum so we can count the business level afterwards
                 monkeys[i].inspectNum++;
@@ -1148,6 +1146,13 @@ int AoC2022::day_11_1(QString user_input)
     return max1 * max2;
 }
 
+// Worry levels are no longer divided by three after each item is inspected;
+// you'll need to find another way to keep your worry levels manageable.
+// Starting again from the initial state in your puzzle input,
+    // what is the level of monkey business after 10000 rounds?
+
+// Resources:
+    // Chinese Remainder Theorem: https://www.youtube.com/watch?v=zIFehsBHB8o
 int AoC2022::day_11_2(QString user_input)
 {
     // auto input = Utilities::splitQStringByNewline(user_input);
@@ -1183,7 +1188,12 @@ int AoC2022::day_11_2(QString user_input)
         monkeys.push_back(monkey);
     }
 
-    for (auto k = 0; k < 20; ++k) {
+    auto N = 1;
+    for (const auto& monkey : monkeys) {
+        N *= monkey.testNum;
+    }
+
+    for (auto k = 0; k < 10000; ++k) {
         // Round
         float worryLevel = 0;
         for (auto i = 0; i < monkeys.size(); ++i) {
@@ -1201,15 +1211,12 @@ int AoC2022::day_11_2(QString user_input)
                     worryLevel = monkeys[i].items[j] + stoi(monkeys[i].operation[2]);
                 }
 
-                // Divide worry level by 3
-                auto finalWorryLevel = static_cast<int>(std::floor(worryLevel / 3));
+                // Instead of dividing finalWorryLevel by three we use module with the multiplied test numbers
+                int finalWorryLevel = static_cast<int>(floor(worryLevel)) % N;
 
                 // Deciding by the result of the test where the bag will be thrown
-                if (finalWorryLevel % monkeys[i].testNum == 0) {
-                    monkeys[monkeys[i].trueCase].items.push_back(finalWorryLevel);
-                } else {
-                    monkeys[monkeys[i].falseCase].items.push_back(finalWorryLevel);
-                }
+                int destination = finalWorryLevel % monkeys[i].testNum == 0 ? monkeys[i].trueCase : monkeys[i].falseCase;
+                monkeys[destination].items.push_back(finalWorryLevel);
 
                 // Adding 1 to the inspectNum so we can count the business level afterwards
                 monkeys[i].inspectNum++;
@@ -1218,21 +1225,33 @@ int AoC2022::day_11_2(QString user_input)
             // Remove the bags that were thrown
             monkeys[i].items.clear();
         }
-        // printMonkeys(monkeys);
+
+        // Test
+        if (k % 1000 == 0) {
+            QTextStream qout(stdout);
+            for (const auto& monkey : monkeys) {
+                qout << monkey.id;
+                qout << " ";
+                qout << monkey.inspectNum;
+                qout << "\n";
+            }
+            qout << "\n";
+        }
     }
 
     auto max1 = 0;
     auto max2 = 0;
-    for (auto i = 0; i < monkeys.size(); ++i) {
-       if (monkeys[i].inspectNum > max1) {
+    for (const auto& monkey : monkeys) {
+       if (monkey.inspectNum > max1) {
             max2 = max1;
-            max1 = monkeys[i].inspectNum;
-       } else if (monkeys[i].inspectNum > max2) {
-           max2 = monkeys[i].inspectNum;
+            max1 = monkey.inspectNum;
+       } else if (monkey.inspectNum > max2) {
+           max2 = monkey.inspectNum;
        }
     }
+    long businessLevel = max1 * max2;
 
-    return max1 * max2;
+    return businessLevel;
 }
 
 
@@ -1268,12 +1287,5 @@ int AoC2022::day_11_2(QString user_input)
 
 
 
-    // for (const auto& elem : monkeyMap) {
-        // qout << elem.first << ": ";
-        // for (auto i = 0; i < elem.second.size(); ++i) {
-            // qout <<  elem.second[i] << ", ";
-        // }
-        // qout << "\n";
-    // }
 
 

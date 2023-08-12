@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->comboBox->addItems({"1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
                             "11"});
-    ui->textEdit->setText("Always provide right input for the right day\n"
+    ui->textEdit->setText("Always provide right input for the right day.\n"
                           "If not there is a possibility that program will crash without any warning!\n");
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::execute);
 }
