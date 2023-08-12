@@ -53,7 +53,7 @@ AoC2022::AoC2022()
     string day_10_2(QString user_input);
 
     int day_11_1(QString user_input);
-    int day_11_2(QString user_input);
+    long long int day_11_2(QString user_input);
 
 }
 
@@ -1150,10 +1150,9 @@ int AoC2022::day_11_1(QString user_input)
 // you'll need to find another way to keep your worry levels manageable.
 // Starting again from the initial state in your puzzle input,
     // what is the level of monkey business after 10000 rounds?
-
 // Resources:
     // Chinese Remainder Theorem: https://www.youtube.com/watch?v=zIFehsBHB8o
-int AoC2022::day_11_2(QString user_input)
+long long int AoC2022::day_11_2(QString user_input)
 {
     // auto input = Utilities::splitQStringByNewline(user_input);
     auto input = Utilities::readAllLinesInFile("/Users/ondrejpazourek/dev/cpp/advent-of-code/2022/qt/data/day_11.txt");
@@ -1193,12 +1192,12 @@ int AoC2022::day_11_2(QString user_input)
         N *= monkey.testNum;
     }
 
-    for (auto k = 0; k < 10000; ++k) {
+    for (auto k = 1; k <= 10000; ++k) {
         // Round
-        float worryLevel = 0;
         for (auto i = 0; i < monkeys.size(); ++i) {
             // Turn
-            for (auto j = 0; j <monkeys[i].items.size(); ++j) {
+            long long int worryLevel = 0;
+            for (auto j = 0; j < monkeys[i].items.size(); ++j) {
 
                 // Figure out its worry level
                 if (monkeys[i].operation[1] == "*" && monkeys[i].operation[2] == "old") {
@@ -1212,11 +1211,11 @@ int AoC2022::day_11_2(QString user_input)
                 }
 
                 // Instead of dividing finalWorryLevel by three we use module with the multiplied test numbers
-                int finalWorryLevel = static_cast<int>(floor(worryLevel)) % N;
+                worryLevel = worryLevel % N;
 
                 // Deciding by the result of the test where the bag will be thrown
-                int destination = finalWorryLevel % monkeys[i].testNum == 0 ? monkeys[i].trueCase : monkeys[i].falseCase;
-                monkeys[destination].items.push_back(finalWorryLevel);
+                int destination = worryLevel % monkeys[i].testNum == 0 ? monkeys[i].trueCase : monkeys[i].falseCase;
+                monkeys[destination].items.push_back(worryLevel);
 
                 // Adding 1 to the inspectNum so we can count the business level afterwards
                 monkeys[i].inspectNum++;
@@ -1249,9 +1248,8 @@ int AoC2022::day_11_2(QString user_input)
            max2 = monkey.inspectNum;
        }
     }
-    long businessLevel = max1 * max2;
 
-    return businessLevel;
+    return max1 * max2;
 }
 
 
