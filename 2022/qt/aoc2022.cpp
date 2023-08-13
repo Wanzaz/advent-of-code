@@ -1,5 +1,5 @@
 #include "aoc2022.h"
-#include "utilities.h"
+#include "Utilities/utilities.h"
 
 #include <iostream>
 #include <fstream>
