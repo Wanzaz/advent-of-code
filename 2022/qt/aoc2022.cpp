@@ -49,6 +49,7 @@ AoC2022::AoC2022()
     int day_08_2(QString user_input);
 
     int day_09_1(QString user_input);
+    int day_09_2(QString user_input);
 
     int day_10_1(QString user_input);
     string day_10_2(QString user_input);
@@ -903,10 +904,11 @@ Position getNextTailPosition(Position *head, Position *tail) {
     return *tail;
 }
 
+// Simulate your complete hypothetical series of motions.
+    // How many positions does the tail of the rope visit at least once?
 int AoC2022::day_09_1(QString user_input)
 {
     auto input = Utilities::splitQStringByNewline(user_input);
-    // auto input = Utilities::readAllLinesInFile("/Users/ondrejpazourek/dev/cpp/advent-of-code/2022/qt/data/day_09.txt");
     vector<pair<string, int>> moves;
 
     // Parse the input
@@ -949,59 +951,57 @@ int AoC2022::day_09_1(QString user_input)
     return visitedPositions.size();
 }
 
-// int AoC2022::day_09_1(QString user_input)
-// {
+// Simulate your complete series of motions on a larger rope with ten knots.
+    // How many positions does the tail of the rope visit at least once?
+int AoC2022::day_09_2(QString user_input)
+{
     // auto input = Utilities::splitQStringByNewline(user_input);
+    auto input = Utilities::readAllLinesInFile("/Users/ondrejpazourek/dev/cpp/advent-of-code/2022/qt/data/day_09.txt");
+    vector<pair<string, int>> moves;
 
-    // // auto grid = vector<vector<char>>{};
-    // // vector<vector<char>> grid(10, vector<char>(10, '*'));
-    // vector<vector<char>> grid(8, vector<char>(8, '*'));
-    // vector<vector<char>> grid2(8, vector<char>(8, '*'));
+    // Parse the input
+    for (const auto& line : input) {
+        auto tokens =  Utilities::splitString(line, ' ');
+        moves.push_back({tokens[0], stoi(tokens[1])});
+    }
 
-    // // Starting point
-    // grid[grid.size() - 1].at(0) = 's';
+    Position head = {0, 0};  // Initial head position
+    vector<Position> tails(10, {0, 0});  // Initial tails position
 
-    // // Keeping track of H and T indexes
-    // auto iTail = grid.size();
-    // auto jTail = 0;
-    // auto iHead = grid.size();
-    // auto jHead = 0;
+    set<Position> visitedPositions;  // Set to store visited positions
 
-    // for (auto index = 0; index < input.size(); ++index) {
-        // auto tokens = Utilities::splitString(input[index], ' ');
-        // auto direction = tokens[0];
-        // auto stepCount = stoi(tokens[1]);
+    visitedPositions.insert(tails[0]);  // Mark the initial position as visited
 
-        // if (direction == "U") {
-            // for (auto i = 1; i <= stepCount; ++i) {
-                // grid[iHead - 1].at(jHead) = 'H';
-                // iHead--;
-                // printGrid(grid);
-            // }
-        // } else if (direction == "D") {
-            // for (auto i = 1; i <= stepCount; ++i) {
-                // grid[iHead + 1].at(jHead) = 'H';
-                // iHead++;
-                // printGrid(grid);
-            // }
-        // } else if (direction == "L") {
-            // for (auto i = 1; i <= stepCount; ++i) {
-                // grid[iHead].at(jHead - 1) = 'H';
-                // jHead--;
-                // printGrid(grid);
-            // }
-        // } else if (direction == "R") {
-            // for (auto i = 1; i <= stepCount; ++i) {
-                // grid[iHead - 1].at(jHead + 1) = 'H';
-                // jHead++;
-                // printGrid(grid);
-            // }
-        // }
+    for (const auto& move : moves) {
+        string direction = move.first;
+        int steps = move.second;
 
-    // }
+        // Update head's position based on the movement
+        for (auto i = 0; i < steps; ++i) {
+            if (direction == "R") head.x++;
+            else if (direction == "L") head.x--;
+            else if (direction == "U") head.y++;
+            else if (direction == "D") head.y--;
 
-    // return 0;
-// }
+            // Update tail positions based on the previous positions
+            Position prevTail = tails[0];
+            getNextTailPosition(&head, &tails[0]);
+
+            for (auto j = 1; j < tails.size(); ++j) {
+                    Position temp = tails[j];
+                    getNextTailPosition(&prevTail, &tails[j]);
+                    prevTail = temp;
+            }
+
+            // Mark the new tail positions as visited
+            for (const auto& tail : tails) {
+                visitedPositions.insert(tail);
+            }
+        }
+    }
+
+    return visitedPositions.size();
+}
 
 
 // Find the signal strength during the 20th, 60th, 100th, 140th, 180th, and 220th cycles.

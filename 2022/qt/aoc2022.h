@@ -39,6 +39,7 @@ public:
     int day_08_2(QString user_input);
 
     int day_09_1(QString user_input);
+    int day_09_2(QString user_input);
 
     int day_10_1(QString user_input);
     string day_10_2(QString user_input);
