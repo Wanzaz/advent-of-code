@@ -10,6 +10,7 @@
 #include <sstream>
 #include <limits>
 #include <unordered_set>
+#include <set>
 #include <unordered_map>
 #include <numeric>
 #include <stack>
@@ -284,8 +285,6 @@ int AoC2022::day_03_2(QString input)
 
     return priority_sum;
 }
-
-
 
 
 // In how many assignment pairs does one range fully contain the other?
@@ -864,86 +863,145 @@ int AoC2022::day_08_2(QString user_input)
 }
 
 
-void printGrid(vector<vector<char>> grid)
-{
-    QTextStream qout(stdout);
-    for (int i = 0; i < grid.size(); ++i) {
-        for (int j = 0; j < grid[i].size(); ++j) {
-            qout << grid[i][j];
-            qout << " ";
-        }
-        qout << " \n";
-    }
-    qout << " \n";
-}
-
-bool isHeadAround(vector<vector<char>> grid, int iTail, int jTail)
-{
-    for (auto i = 0; i < iTail - 1; ++i) {
-        for (auto j = 0; j < grid.size() - 1 - j; ++j) {
-
-        }
-    }
-
-
-    return true;
-}
-
 // Simulate your complete hypothetical series of motions.
     // How many positions does the tail of the rope visit at least once?
+struct Position {
+    int x, y;
+
+    // Custom comparison operator for set
+    bool operator<(const Position& other) const {
+        return x < other.x || (x == other.x && y < other.y);
+    }
+};
+
+template<class T, class U>
+QTextStream& operator<<(QTextStream& out, const QPair<T, U>& pair) {
+    QTextStream qout(stdout);
+    qout << QString("QPair<%1, %2> ")
+               .arg(QString::fromStdString(pair.first))
+               .arg(QString::number(pair.second));
+    return out;
+}
+
+Position getNextTailPosition(Position *head, Position *tail) {
+    // Update tail's position if head is not adjacent to tail
+    int rowDist = abs(head->x - tail->x);
+    int colDist = abs(head->y - tail->y);
+
+    if (rowDist > 1 || colDist > 1) {
+        // Move tail diagonally towards head
+        // The tail->x += 0 or tail->y += 0 cannot happen because of the if statement above
+        // But I wanted to use the ternary operator so I had to include the else case...
+        tail->x += (head->x > tail->x) ? 1 : (head->x < tail->x) ? -1 : 0;
+        tail->y += (head->y > tail->y) ? 1 : (head->y < tail->y) ? -1 : 0;
+    } else if (rowDist == 2) {
+        tail->x += (head->x > tail->x) ? 1 : -1;
+    } else if (colDist == 2) {
+        tail->y += (head->y > tail->y) ? 1 : -1;
+    }
+
+    return *tail;
+}
+
 int AoC2022::day_09_1(QString user_input)
 {
     auto input = Utilities::splitQStringByNewline(user_input);
+    // auto input = Utilities::readAllLinesInFile("/Users/ondrejpazourek/dev/cpp/advent-of-code/2022/qt/data/day_09.txt");
+    vector<pair<string, int>> moves;
 
-    // auto grid = vector<vector<char>>{};
-    // vector<vector<char>> grid(10, vector<char>(10, '*'));
-    vector<vector<char>> grid(8, vector<char>(8, '*'));
-    vector<vector<char>> grid2(8, vector<char>(8, '*'));
-
-    // Starting point
-    grid[grid.size() - 1].at(0) = 's';
-
-    // Keeping track of H and T indexes
-    auto iTail = grid.size();
-    auto jTail = 0;
-    auto iHead = grid.size();
-    auto jHead = 0;
-
-    for (auto index = 0; index < input.size(); ++index) {
-        auto tokens = Utilities::splitString(input[index], ' ');
-        auto direction = tokens[0];
-        auto stepCount = stoi(tokens[1]);
-
-        if (direction == "U") {
-            for (auto i = 1; i <= stepCount; ++i) {
-                grid[iHead - 1].at(jHead) = 'H';
-                iHead--;
-                printGrid(grid);
-            }
-        } else if (direction == "D") {
-            for (auto i = 1; i <= stepCount; ++i) {
-                grid[iHead + 1].at(jHead) = 'H';
-                iHead++;
-                printGrid(grid);
-            }
-        } else if (direction == "L") {
-            for (auto i = 1; i <= stepCount; ++i) {
-                grid[iHead].at(jHead - 1) = 'H';
-                jHead--;
-                printGrid(grid);
-            }
-        } else if (direction == "R") {
-            for (auto i = 1; i <= stepCount; ++i) {
-                grid[iHead - 1].at(jHead + 1) = 'H';
-                jHead++;
-                printGrid(grid);
-            }
-        }
-
+    // Parse the input
+    for (const auto& line : input) {
+        auto tokens =  Utilities::splitString(line, ' ');
+        moves.push_back({tokens[0], stoi(tokens[1])});
     }
 
-    return 0;
+    // Print the input
+    for (const auto& move : moves) {
+        QTextStream qout(stdout);
+        qout << move;
+        qout << "\n";
+    }
+
+    Position head = {0, 0};  // Initial head position
+    Position tail = {0, 0};  // Initial tail position
+    set<Position> visitedPositions;  // Set to store visited positions
+
+    visitedPositions.insert(tail);  // Mark the initial position as visited
+
+    for (const auto& move : moves) {
+        string direction = move.first;
+        int steps = move.second;
+
+        // Update head's position based on the movement
+        for (auto i = 0; i < steps; ++i) {
+            if (direction == "R") head.x++;
+            else if (direction == "L") head.x--;
+            else if (direction == "U") head.y++;
+            else if (direction == "D") head.y--;
+
+            getNextTailPosition(&head, &tail);
+
+            // Mark the new tail position as visited
+            visitedPositions.insert(tail);
+        }
+    }
+
+    return visitedPositions.size();
 }
+
+// int AoC2022::day_09_1(QString user_input)
+// {
+    // auto input = Utilities::splitQStringByNewline(user_input);
+
+    // // auto grid = vector<vector<char>>{};
+    // // vector<vector<char>> grid(10, vector<char>(10, '*'));
+    // vector<vector<char>> grid(8, vector<char>(8, '*'));
+    // vector<vector<char>> grid2(8, vector<char>(8, '*'));
+
+    // // Starting point
+    // grid[grid.size() - 1].at(0) = 's';
+
+    // // Keeping track of H and T indexes
+    // auto iTail = grid.size();
+    // auto jTail = 0;
+    // auto iHead = grid.size();
+    // auto jHead = 0;
+
+    // for (auto index = 0; index < input.size(); ++index) {
+        // auto tokens = Utilities::splitString(input[index], ' ');
+        // auto direction = tokens[0];
+        // auto stepCount = stoi(tokens[1]);
+
+        // if (direction == "U") {
+            // for (auto i = 1; i <= stepCount; ++i) {
+                // grid[iHead - 1].at(jHead) = 'H';
+                // iHead--;
+                // printGrid(grid);
+            // }
+        // } else if (direction == "D") {
+            // for (auto i = 1; i <= stepCount; ++i) {
+                // grid[iHead + 1].at(jHead) = 'H';
+                // iHead++;
+                // printGrid(grid);
+            // }
+        // } else if (direction == "L") {
+            // for (auto i = 1; i <= stepCount; ++i) {
+                // grid[iHead].at(jHead - 1) = 'H';
+                // jHead--;
+                // printGrid(grid);
+            // }
+        // } else if (direction == "R") {
+            // for (auto i = 1; i <= stepCount; ++i) {
+                // grid[iHead - 1].at(jHead + 1) = 'H';
+                // jHead++;
+                // printGrid(grid);
+            // }
+        // }
+
+    // }
+
+    // return 0;
+// }
 
 
 // Find the signal strength during the 20th, 60th, 100th, 140th, 180th, and 220th cycles.
