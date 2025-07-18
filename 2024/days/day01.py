@@ -40,5 +40,15 @@ class Day01(AdventDay):
         return sum(difference)
 
     def solve_part2(self):
-        return "Not implemented yet"
+        pairs  = self.parse_input()
+
+        left_numbers = [l for l, _ in pairs]
+        right_numbers = [r for _, r in pairs]
+
+        similarity_score = 0
+        for l in left_numbers:
+            count = right_numbers.count(l)
+            similarity_score += l * count
+
+        return similarity_score
 
