@@ -2,10 +2,12 @@ import argparse
 from utils.input_loader import InputLoader
 from days import day01
 from days import day02
+from days import day03
 
 DAYS = {
     1: day01.Day01,
     2: day02.Day02,
+    3: day03.Day03,
 }
 
 def main():
