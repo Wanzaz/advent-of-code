@@ -59,52 +59,60 @@ class Day04(AdventDay):
                             total += 1
         return total
 
+
     def is_A(self, element):
         return element == 'A'
-
-    def is_M(self, element):
-        return element == 'M'
-
-    def is_S(self, element):
-        return element == 'S'
 
     def solve_part2(self):
         total = 0
 
-        # don't start at the last line because it has to have diagonal element...
         for row in range(1, self.rows - 1):
             for col in range(1, self.cols - 1):
                 if self.is_A(self.matrix[row][col]):
-                    r_r = row
-                    r_c = col
-
-                    # 1️⃣ MAS ↖↘ a MAS ↗↙
-                    if (
-                        self.is_M(self.matrix[r_r - 1][r_c - 1]) and self.is_S(self.matrix[r_r + 1][r_c + 1]) and
-                        self.is_M(self.matrix[r_r - 1][r_c + 1]) and self.is_S(self.matrix[r_r + 1][r_c - 1])
-                    ):
-                        total += 1
-
-                    # 2️⃣ SAM ↖↘ a SAM ↗↙
-                    elif (
-                        self.is_S(self.matrix[r_r - 1][r_c - 1]) and self.is_M(self.matrix[r_r + 1][r_c + 1]) and
-                        self.is_S(self.matrix[r_r - 1][r_c + 1]) and self.is_M(self.matrix[r_r + 1][r_c - 1])
-                    ):
-                        total += 1
-
-                    # 3️⃣ MAS ↖↘ a SAM ↗↙
-                    elif (
-                        self.is_M(self.matrix[r_r - 1][r_c - 1]) and self.is_S(self.matrix[r_r + 1][r_c + 1]) and
-                        self.is_S(self.matrix[r_r - 1][r_c + 1]) and self.is_M(self.matrix[r_r + 1][r_c - 1])
-                    ):
-                        total += 1
-
-                    # 4️⃣ SAM ↖↘ a MAS ↗↙
-                    elif (
-                        self.is_S(self.matrix[r_r - 1][r_c - 1]) and self.is_M(self.matrix[r_r + 1][r_c + 1]) and
-                        self.is_M(self.matrix[r_r - 1][r_c + 1]) and self.is_S(self.matrix[r_r + 1][r_c - 1])
-                    ):
+                    x = self.matrix[row + 1][col + 1] + 'A' + self.matrix[row - 1][col - 1] 
+                    y = self.matrix[row + 1][col - 1] + 'A' + self.matrix[row - 1][col + 1]
+                    if x in ('SAM', 'MAS') and y in ('SAM', 'MAS'):
                         total += 1
 
         return total
+
+    # def solve_part2(self):
+    #     total = 0 
+
+    #     # don't start at the last line because it has to have diagonal element...
+    #     for row in range(1, self.rows - 1):
+    #         for col in range(1, self.cols - 1):
+    #             if self.is_A(self.matrix[row][col]):
+    #                 r_r = row
+    #                 r_c = col
+
+    #                 # 1️⃣ MAS ↖↘ a MAS ↗↙
+    #                 if (
+    #                     self.is_M(self.matrix[r_r - 1][r_c - 1]) and self.is_S(self.matrix[r_r + 1][r_c + 1]) and
+    #                     self.is_M(self.matrix[r_r - 1][r_c + 1]) and self.is_S(self.matrix[r_r + 1][r_c - 1])
+    #                 ):
+    #                     total += 1
+
+    #                 # 2️⃣ SAM ↖↘ a SAM ↗↙
+    #                 elif (
+    #                     self.is_S(self.matrix[r_r - 1][r_c - 1]) and self.is_M(self.matrix[r_r + 1][r_c + 1]) and
+    #                     self.is_S(self.matrix[r_r - 1][r_c + 1]) and self.is_M(self.matrix[r_r + 1][r_c - 1])
+    #                 ):
+    #                     total += 1
+
+    #                 # 3️⃣ MAS ↖↘ a SAM ↗↙
+    #                 elif (
+    #                     self.is_M(self.matrix[r_r - 1][r_c - 1]) and self.is_S(self.matrix[r_r + 1][r_c + 1]) and
+    #                     self.is_S(self.matrix[r_r - 1][r_c + 1]) and self.is_M(self.matrix[r_r + 1][r_c - 1])
+    #                 ):
+    #                     total += 1
+
+    #                 # 4️⃣ SAM ↖↘ a MAS ↗↙
+    #                 elif (
+    #                     self.is_S(self.matrix[r_r - 1][r_c - 1]) and self.is_M(self.matrix[r_r + 1][r_c + 1]) and
+    #                     self.is_M(self.matrix[r_r - 1][r_c + 1]) and self.is_S(self.matrix[r_r + 1][r_c - 1])
+    #                 ):
+    #                     total += 1
+
+    #     return total
 
